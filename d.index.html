@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>⚡ Hammer Smash | Telegram Mini Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 20% 30%, #1a2a2f, #0a1217);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Roboto, system-ui, 'Helvetica Neue', sans-serif;
+            padding: 16px;
+        }
+
+        /* Главный контейнер с эффектом стекла */
+        .game {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(20, 30, 35, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 64px;
+            padding: 20px 18px 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 210, 120, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        /* Панель баланса и ставки */
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: #00000055;
+            backdrop-filter: blur(4px);
+            border-radius: 60px;
+            padding: 12px 18px;
+            flex: 1;
+            text-align: center;
+            border: 1px solid rgba(255, 200, 100, 0.4);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.4), 0 5px 12px rgba(0,0,0,0.3);
+        }
+
+        .stat-card span:first-child {
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            font-weight: 600;
+            color: #ffda88;
+            text-transform: uppercase;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #f5f0e0;
+            text-shadow: 0 2px 3px black;
+            line-height: 1.2;
+        }
+
+        /* Управление ставкой */
+        .bet-control {
+            display: flex;
+            background: #1e2e34;
+            border-radius: 60px;
+            overflow: hidden;
+            border: 1px solid #ffb347;
+            margin-top: 8px;
+        }
+
+        .bet-control button {
+            background: #2f4a54;
+            border: none;
+            color: white;
+            font-size: 1.6rem;
+            font-weight: bold;
+            width: 48px;
+            cursor: pointer;
+            transition: 0.08s linear;
+        }
+
+        .bet-control button:active { background: #ff8c42; transform: scale(0.96);}
+        .bet-control input {
+            background: #0f1c1f;
+            border: none;
+            color: #ffecb3;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            width: 110px;
+            padding: 8px 0;
+            outline: none;
+        }
+
+        /* Рулетка */
+        .roulette {
+            background: #0f1a1ed9;
+            border-radius: 70px;
+            padding: 20px 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            box-shadow: inset 0 0 6px #00000077, 0 8px 20px black;
+        }
+
+        .hammer-result {
+            font-size: 3.5rem;
+            font-weight: bold;
+            background: #00000077;
+            border-radius: 100px;
+            display: inline-block;
+            padding: 8px 30px;
+            margin-bottom: 12px;
+            backdrop-filter: blur(5px);
+        }
+
+        .hammer-desc {
+            font-size: 0.9rem;
+            background: #00000066;
+            border-radius: 40px;
+            display: inline-block;
+            padding: 6px 18px;
+            color: #ffdfaa;
+        }
+
+        .spin-btn {
+            background: linear-gradient(135deg, #ffb347, #ff7e05);
+            border: none;
+            font-size:
+
+
+1.6rem;
+            font-weight: bold;
+            padding: 12px 25px;
+            border-radius: 60px;
+            color: white;
+            text-shadow: 0 1px 2px #a03d00;
+            cursor: pointer;
+            width: 80%;
+            margin-top: 15px;
+            box-shadow: 0 7px 0 #9b4b00;
+            transition: 0.05s linear;
+        }
+
+        .spin-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 3px 0 #9b4b00;
+        }
+
+        /* Блоки */
+        .blocks-title {
+            text-align: center;
+            margin: 15px 0 12px;
+            font-weight: bold;
+            color: #ffefcf;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .blocks {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 15px;
+        }
+
+        .block {
+            background: radial-gradient(ellipse at 30% 25%, #d4af6a, #8b5a2b);
+            width: 90px;
+            height: 100px;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.8rem;
+            color: #2e241a;
+            text-shadow: 0 1px 0 #ffdd99;
+            box-shadow: 0 8px 0 #5a3a1a;
+            transition: 0.06s linear;
+            cursor: pointer;
+            border: 1px solid #ffd58c;
+        }
+
+        .block span {
+            font-size: 0.8rem;
+            background: #00000077;
+            padding: 2px 10px;
+            border-radius: 30px;
+            margin-top: 6px;
+            color: #ffefb9;
+        }
+
+        .block:active {
+            transform: translateY(4px);
+            box-shadow: 0 3px 0 #5a3a1a;
+        }
+
+        .block.disabled, .block.broken {
+            filter: grayscale(0.5);
+            opacity: 0.5;
+            pointer-events: none;
+            transform: translateY(0);
+            box-shadow: 0 5px 0 #5a3a1a;
+        }
+
+        /* Анимация удара */
+        @keyframes smash {
+            0% { transform: scale(1); background: radial-gradient(ellipse at 30% 25%, #ffd966, #b87c2e);}
+            50% { transform: scale(0.92); background: radial-gradient(ellipse at 30% 25%, #ffaa33, #c96f00);}
+            100% { transform: scale(1); background: radial-gradient(ellipse at 30% 25%, #d4af6a, #8b5a2b);}
+        }
+
+        .block-hit {
+            animation: smash 0.2s ease-in-out;
+        }
+
+        /* Инфо и кнопка сброса */
+        .info-area {
+            text-align: center;
+            font-size: 0.8rem;
+            background: #00000077;
+            border-radius: 50px;
+            padding: 8px 12px;
+            margin-top: 12px;
+            color: #ffddbb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .reset-btn {
+            background: #3a2a2a;
+            border: none;
+            color: #ffbb77;
+            padding: 5px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .reset-btn:active { background: #5e3a3a; transform: scale(0.96);}
+
+        button:disabled {
+            opacity: 0.5;
+            transform: translateY(0);
+            pointer-events: none;
+        }
+
+        max-width: 550px {
+            .block { width: 75px; height: 85px; font-size: 1.4rem;}
+            .hammer-result { font-size: 2.5rem; padding: 6px 20px;}
+            .stat-card .value { font-size: 1.5rem; }
+            .game { padding: 16px 12px 22px; }
+        }
+    </style>
+</head>
+<body>
+<div class="game">
+    <div class="stats">
+        <div class="stat-card">
+            <span>💰 БАЛАНС</span>
+            <div class="value" id="balance">1000</div>
+        </div>
+        <div class="stat-card">
+            <span>⚙️ СТАВКА</span>
+            <div class="bet-control">
+                <button id="betDec">−</button>
+
+
+<input type="number" id="betAmount" value="50" step="10" min="10">
+                <button id="betInc">+</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="roulette">
+        <div class="hammer-result" id="hammerIcon">🔨 ?</div>
+        <div class="hammer-desc" id="hammerDesc">Крути рулетку!</div>
+        <button class="spin-btn" id="spinBtn">🎲 КРУТИТЬ</button>
+    </div>
+
+    <div class="blocks-title">💥 ВЫБЕРИ БЛОК ДЛЯ УДАРА 💥</div>
+    <div class="blocks" id="blocksContainer"></div>
+
+    <div class="info-area">
+        <span id="gameMessage">🔨 Выпадет молоток → ломай блок x2,x3,x5,x7</span>
+        <button class="reset-btn" id="resetProgress">🔄 Сброс</button>
+    </div>
+</div>
+
+<script>
+    // ------------------- Игровая конфигурация -------------------
+    const CONFIG = {
+        DEFAULT_BALANCE: 1000,
+        MIN_BET: 10,
+        MAX_BET: 10000,
+        HAMMER_POWERS: [1, 2, 3, null],   // null = пусто
+        BLOCKS: [
+            { mult: 2, name: "x2", emoji: "🪨" },
+            { mult: 3, name: "x3", emoji: "🗿" },
+            { mult: 5, name: "x5", emoji: "💎" },
+            { mult: 7, name: "x7", emoji: "✨" }
+        ],
+        POWER_NAMES: { 1: "🔨 Слабый", 2: "🔨🔨 Средний", 3: "🔨🔨🔨 Сильный" }
+    };
+
+    // ------------------- Состояние игры -------------------
+    let gameState = {
+        balance: CONFIG.DEFAULT_BALANCE,
+        currentBet: 50,
+        phase: "idle",        // idle, spinning, hammerReady, waitingReset
+        hammerPower: null,    // 1,2,3 или null
+        blockUsed: false,
+        blocksDOM: []
+    };
+
+    // DOM элементы
+    const balanceEl = document.getElementById("balance");
+    const betInput = document.getElementById("betAmount");
+    const spinBtn = document.getElementById("spinBtn");
+    const hammerIcon = document.getElementById("hammerIcon");
+    const hammerDesc = document.getElementById("hammerDesc");
+    const blocksContainer = document.getElementById("blocksContainer");
+    const gameMessage = document.getElementById("gameMessage");
+
+    // ------------------- Вспомогательные функции -------------------
+    function saveToLocalStorage() {
+        localStorage.setItem("hammerGame_balance", gameState.balance);
+    }
+
+    function loadFromLocalStorage() {
+        const saved = localStorage.getItem("hammerGame_balance");
+        if (saved !== null && !isNaN(parseFloat(saved))) {
+            gameState.balance = Math.max(0, parseFloat(saved));
+        } else {
+            gameState.balance = CONFIG.DEFAULT_BALANCE;
+        }
+        updateUI();
+    }
+
+    function updateUI() {
+        balanceEl.innerText = Math.floor(gameState.balance);
+        betInput.value = gameState.currentBet;
+        // блокировка кнопки спина
+        const canSpin = (gameState.phase === "idle" && gameState.balance >= gameState.currentBet);
+        spinBtn.disabled = !canSpin;
+    }
+
+    function updateBlocksInteractive() {
+        const canInteract = (gameState.phase === "hammerReady" && !gameState.blockUsed);
+        gameState.blocksDOM.forEach(block => {
+            if (canInteract) {
+                block.classList.remove("disabled", "broken");
+                block.style.pointerEvents = "auto";
+            } else {
+                block.classList.add("disabled");
+                block.style.pointerEvents = "none";
+            }
+            if (gameState.blockUsed) block.classList.add("broken");
+        });
+    }
+
+    function setMessage(msg, isError = false) {
+        gameMessage.innerHTML = msg;
+        if (isError) {
+            setTimeout(() => {
+                if (gameMessage.innerHTML === msg) gameMessage.innerHTML = "🔨 Выпадет молоток → ломай блок x2,x3,x5,x7";
+            }, 2500);
+        }
+    }
+
+    // Сброс раунда после удара или пустого спина
+    function resetRound() {
+        gameState.phase = "idle";
+        gameState.hammerPower = null;
+        gameState.blockUsed = false;
+        hammerIcon.innerHTML = "🔨 ?";
+        hammerDesc.innerText = "Готов к новой ставке";
+        updateBlocksInteractive();
+        updateUI();
+    }
+
+    // Завершение спина с результатом
+
+
+function finishSpin(resultPower) {
+        gameState.hammerPower = resultPower;
+        if (resultPower === null) {
+            // Проигрыш, ставка уже списана
+            hammerIcon.innerHTML = "💨 ПУСТО";
+            hammerDesc.innerText = "Ничего не выпало!";
+            setMessage(`😞 Не повезло! Вы потеряли ${gameState.currentBet} монет.`, false);
+            gameState.phase = "idle";    // сразу можно крутить заново
+            gameState.blockUsed = false;
+            updateBlocksInteractive();
+            updateUI();
+            // сбросить иконку через секунду
+            setTimeout(() => {
+                if (gameState.phase === "idle") {
+                    hammerIcon.innerHTML = "🔨 ?";
+                    hammerDesc.innerText = "Крути рулетку!";
+                }
+            }, 1500);
+        } else {
+            // Молоток выпал
+            const powerText = CONFIG.POWER_NAMES[resultPower] || `Молот x${resultPower}`;
+            hammerIcon.innerHTML = `${powerText} ⚡`;
+            hammerDesc.innerText = `Сила ${resultPower}x! Бей блок!`;
+            setMessage(`🎉 Молоток силы ${resultPower}! Нажми на любой блок, чтобы умножить ставку!`, false);
+            gameState.phase = "hammerReady";
+            gameState.blockUsed = false;
+            updateBlocksInteractive();
+        }
+        spinBtn.disabled = false;
+        updateUI();
+    }
+
+    // Анимация рулетки с "прокруткой"
+    function spinRoulette() {
+        if (gameState.phase !== "idle") {
+            setMessage("⚠️ Заверши текущий раунд!", true);
+            return false;
+        }
+        if (gameState.balance < gameState.currentBet) {
+            setMessage("❌ Недостаточно средств! Уменьши ставку.", true);
+            return false;
+        }
+
+        // Списываем ставку
+        gameState.balance -= gameState.currentBet;
+        saveToLocalStorage();
+        updateUI();
+        gameState.phase = "spinning";
+        spinBtn.disabled = true;
+
+        setMessage("🎡 Рулетка крутится...");
+        hammerIcon.innerHTML = "🌀🌀🌀";
+        hammerDesc.innerText = "Выпадает...";
+
+        const outcomes = CONFIG.HAMMER_POWERS;
+        let step = 0;
+        const totalSteps = 14;
+        const interval = setInterval(() => {
+            const randomTemp = outcomes[Math.floor(Math.random() * outcomes.length)];
+            if (randomTemp === null) {
+                hammerIcon.innerHTML = "💨 ?";
+                hammerDesc.innerText = "Мимо...";
+            } else {
+                hammerIcon.innerHTML = CONFIG.POWER_NAMES[randomTemp] + " ⚡".repeat(randomTemp);
+                hammerDesc.innerText = `Сила ${randomTemp}x`;
+            }
+            step++;
+            if (step >= totalSteps) {
+                clearInterval(interval);
+                const finalResult = outcomes[Math.floor(Math.random() * outcomes.length)];
+                finishSpin(finalResult);
+            }
+        }, 65);
+        return true;
+    }
+
+    // Использовать молоток на блоке
+    function useHammer(blockIndex, multiplier) {
+        if (gameState.phase !== "hammerReady" || gameState.blockUsed || gameState.hammerPower === null) {
+            setMessage("⚡ Сначала выиграй молоток в рулетке!", true);
+            return;
+        }
+        const power = gameState.hammerPower;
+        const winAmount = gameState.currentBet * multiplier * power;
+        gameState.balance += winAmount;
+        gameState.blockUsed = true;
+        saveToLocalStorage();
+        updateUI();
+
+        // Анимация удара по блоку
+        const targetBlock = gameState.blocksDOM[blockIndex];
+        targetBlock.classList.add("block-hit");
+        setTimeout(() => targetBlock.classList.remove("block-hit"), 250);
+
+        hammerIcon.innerHTML = `💥 ${CONFIG.POWER_NAMES[power]} 💥`;
+        hammerDesc.innerText = `Удар! +${winAmount} монет`;
+        setMessage(`🎉 Ты разбил блок x${multiplier} молотком силы ${power}! Выигрыш: ${winAmount} 🎉`, false);
+
+        gameState.phase = "waitingReset";
+        updateBlocksInteractive();
+
+        // Сброс раунда через 1.8 сек
+        setTimeout(() => {
+            if (gameState.phase === "wa
+
+
+itingReset") {
+                resetRound();
+                setMessage("🔨 Крути рулетку заново!", false);
+                updateUI();
+            }
+        }, 1800);
+    }
+
+    // Создание блоков
+    function buildBlocks() {
+        blocksContainer.innerHTML = "";
+        gameState.blocksDOM = [];
+        CONFIG.BLOCKS.forEach((block, idx) => {
+            const blockDiv = document.createElement("div");
+            blockDiv.className = "block";
+            blockDiv.setAttribute("data-mult", block.mult);
+            blockDiv.innerHTML = `🔨 ${block.mult}x
+<span>${block.emoji} множитель<
+n>`;
+            blockDiv.addEventListener("click", (e) => {
+                e.stopPropagation();
+                useHammer(idx, block.mult);
+            });
+            blocksContainer.appendChild(blockDiv);
+            gameState.blocksDOM.push(blockDiv);
+        });
+        updateBlocksInteractive();
+    }
+
+    // Изменение ставки
+    function changeBet(delta) {
+        if (gameState.phase !== "idle") {
+            setMessage("Изменить ставку можно только между раундами", true);
+            return;
+        }
+        let newVal = gameState.currentBet + delta;
+        if (newVal < CONFIG.MIN_BET) newVal = CONFIG.MIN_BET;
+        if (newVal > gameState.balance && gameState.balance > 0) newVal = gameState.balance;
+        if (newVal > CONFIG.MAX_BET) newVal = CONFIG.MAX_BET;
+        if (newVal <= 0) newVal = CONFIG.MIN_BET;
+        gameState.currentBet = newVal;
+        updateUI();
+    }
+
+    function handleBetInput() {
+        let raw = parseInt(betInput.value);
+        if (isNaN(raw)) raw = CONFIG.MIN_BET;
+        raw = Math.min(CONFIG.MAX_BET, Math.max(CONFIG.MIN_BET, raw));
+        if (raw > gameState.balance && gameState.balance > 0) raw = gameState.balance;
+        if (raw <= 0) raw = CONFIG.MIN_BET;
+        gameState.currentBet = raw;
+        updateUI();
+    }
+
+    // Сброс прогресса (баланс по умолчанию)
+    function resetProgress() {
+        if (gameState.phase !== "idle") {
+            setMessage("Сначала закончи раунд!", true);
+            return;
+        }
+        gameState.balance = CONFIG.DEFAULT_BALANCE;
+        gameState.currentBet = Math.min(gameState.currentBet, gameState.balance);
+        saveToLocalStorage();
+        updateUI();
+        resetRound();
+        setMessage("🔄 Баланс сброшен до 1000 монет", false);
+        hammerIcon.innerHTML = "🔨 ?";
+        hammerDesc.innerText = "Крути рулетку!";
+    }
+
+    // ------------------- Инициализация -------------------
+    function init() {
+        loadFromLocalStorage();
+        buildBlocks();
+        updateUI();
+        resetRound(); // приведение фаз в порядок
+
+        // Обработчики
+        document.getElementById("spinBtn").addEventListener("click", spinRoulette);
+        document.getElementById("betDec").addEventListener("click", () => changeBet(-10));
+        document.getElementById("betInc").addEventListener("click", () => changeBet(10));
+        betInput.addEventListener("change", handleBetInput);
+        betInput.addEventListener("input", function() {
+            let val = parseInt(this.value);
+            if (!isNaN(val) && val > CONFIG.MAX_BET) this.value = CONFIG.MAX_BET;
+            if (val < CONFIG.MIN_BET) this.value = CONFIG.MIN_BET;
+        });
+        document.getElementById("resetProgress").addEventListener("click", resetProgress);
+
+        // Сохранение баланса при любом изменении (кроме уже сохранений)
+        window.addEventListener("beforeunload", () => saveToLocalStorage());
+    }
+
+    init();
+</script>
+</body>
+</html>
