@@ -3,83 +3,347 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hammer Smash — круши блоки</title>
+    <title>Minecraft Hammer Dungeon | Рулетка + Пробивание блоков</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;user-select:none}
-        body{min-height:100vh;background:radial-gradient(circle at 20% 30%,#1a2a2f,#0a1217);display:flex;justify-content:center;align-items:center;font-family:system-ui,sans-serif;padding:16px}
-        .game{max-width:550px;width:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(12px);border-radius:48px;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,0.3);border:1px solid rgba(255,200,100,0.3)}
-        .stats{display:flex;gap:12px;margin-bottom:20px}
-        .card{background:#00000066;flex:1;border-radius:40px;padding:12px;text-align:center}
-        .card span:first-child{color:#ffd966;font-size:0.75rem;text-transform:uppercase}
-        .card .value{font-size:1.8rem;font-weight:bold;color:#f5f0e0}
-        .bet-control{display:flex;background:#1e2e34;border-radius:40px;margin-top:8px}
-        .bet-control button{background:#3e5a64;border:none;width:44px;font-size:1.5rem;font-weight:bold;color:white;cursor:pointer;border-radius:40px}
-        .bet-control input{background:#0f1c1f;border:none;text-align:center;width:100px;color:#ffecb3;font-weight:bold;font-size:1.2rem;outline:none}
-        .roulette{background:#0f1a1ecc;border-radius:60px;padding:20px;text-align:center;margin-bottom:20px}
-        .hammer{font-size:3rem;background:#00000066;display:inline-block;padding:8px 24px;border-radius:60px;margin-bottom:8px}
-        .desc{color:#ffdfaa;background:#00000055;display:inline-block;padding:5px 16px;border-radius:30px;font-size:0.85rem}
-        .spin-btn{background:linear-gradient(135deg,#ffb347,#ff7e05);border:none;font-size:1.4rem;font-weight:bold;padding:10px 20px;border-radius:40px;color:white;cursor:pointer;margin-top:15px;width:80%;box-shadow:0 5px 0 #9b4b00}
-        .spin-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #9b4b00}
-        .blocks{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:15px 0}
-        .block{background:radial-gradient(ellipse at 30% 25%,#d4af6a,#8b5a2b);width:80px;height:90px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:bold;font-size:1.5rem;color:#2e241a;box-shadow:0 6px 0 #5a3a1a;cursor:pointer;transition:0.05s linear}
-        .block span{font-size:0.7rem;background:#00000077;padding:2px 8px;border-radius:20px;color:#ffefb9;margin-top:5px}
-        .block:active{transform:translateY(3px);box-shadow:0 2px 0 #5a3a1a}
-        .disabled,.broken{filter:grayscale(0.6);opacity:0.5;pointer-events:none;transform:none !important}
-        .info{background:#00000066;border-radius:40px;padding:8px 12px;font-size:0.75rem;text-align:center;color:#ffddbb;display:flex;justify-content:space-between;margin-top:10px}
-        .reset-btn{background:#3a2a2a;border:none;color:#ffbb77;padding:4px 12px;border-radius:30px;cursor:pointer}
-        button:disabled{opacity:0.5;transform:none;pointer-events:none}
-        @media (max-width:500px){.block{width:70px;height:80px;font-size:1.2rem}.hammer{font-size:2rem}}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
+        body {
+            min-height: 100vh;
+            background: #1a2f1f;
+            background-image: radial-gradient(circle at 10% 20%, #3c5e2b, #1f3a1a);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            padding: 16px;
+        }
+        .game {
+            max-width: 650px;
+            width: 100%;
+            background: #2c2c2c;
+            background-image: repeating-linear-gradient(45deg, #3a3a3a 0px, #3a3a3a 2px, #2c2c2c 2px, #2c2c2c 6px);
+            border: 4px solid #7c7c7c;
+            box-shadow: 0 0 0 4px #4c4c4c, inset 0 0 0 2px #9e9e9e;
+            border-radius: 16px;
+            padding: 20px;
+        }
+        /* панели */
+        .stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .card {
+            background: #1f1f1f;
+            border: 3px solid #6b6b6b;
+            flex: 1;
+            padding: 10px 8px;
+            text-align: center;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.6), 0 4px 0 #2a2a2a;
+        }
+        .card span:first-child {
+            font-size: 0.55rem;
+            color: #e0e0e0;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .value {
+            font-size: 1.3rem;
+            color: #ffd966;
+            text-shadow: 2px 2px 0 #4a3a1a;
+        }
+        .bet-control {
+            display: flex;
+            margin-top: 8px;
+            background: #0f0f0f;
+            border: 2px solid #5c5c5c;
+        }
+        .bet-control button {
+            background: #3a3a3a;
+            border: none;
+            width: 36px;
+            font-size: 1rem;
+            font-family: monospace;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+        .bet-control input {
+            background: #2a2a2a;
+            border: none;
+            width: 90px;
+            text-align: center;
+            color: #ffea9e;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7rem;
+            outline: none;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .action-btn {
+            background: #3d2b1a;
+            border: none;
+            font-family: monospace;
+            font-size: 0.65rem;
+            padding: 6px 14px;
+            color: #ffdd99;
+            box-shadow: 0 4px 0 #1f1409;
+            cursor: pointer;
+            transition: 0.05s linear;
+        }
+        .action-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #1f1409; }
+        .roulette {
+            background: #1a1a1a;
+            border: 4px solid #6b4c2c;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .hammer {
+            font-size: 2.5rem;
+            background: #111;
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 16px;
+            border: 2px solid #b97f3a;
+            margin-bottom: 8px;
+        }
+        .desc {
+            font-size: 0.55rem;
+            background: #2c2418;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            color: #ffdb8e;
+        }
+        .spin-btn {
+            background: #567d46;
+            border: none;
+            font-family: monospace;
+            font-size: 0.9rem;
+            padding: 8px 20px;
+            margin-top: 12px;
+            color: white;
+            text-shadow: 2px 2px 0 #2a4a1a;
+            box-shadow: 0 5px 0 #2d5420;
+            cursor: pointer;
+            width: 70%;
+        }
+        .spin-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #2d5420; }
+        /* dungeon blocks */
+        .dungeon-area {
+            background: #2a241aea;
+            border: 3px solid #8b6946;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 20px;
+        }
+        .blocks-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .dungeon-block {
+            background: #a87b3f;
+            background-image: repeating-linear-gradient(45deg, #c4913e 0px, #c4913e 4px, #a5712e 4px, #a5712e 8px);
+            width: 70px;
+            padding: 12px 4px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 0.7rem;
+            border: 2px solid #533a1a;
+            box-shadow: 0 6px 0 #4a321a;
+            position: relative;
+            cursor: pointer;
+            transition: 0.05s linear;
+        }
+        .dungeon-block.active-block {
+            filter: brightness(1.1);
+            box-shadow: 0 0 0 2px #ffcc66;
+            cursor: pointer;
+        }
+        .dungeon-block.broken {
+            filter: grayscale(0.7) brightness(0.6);
+            box-shadow: 0 2px 0 #4a321a;
+            transform: translateY(4px);
+            cursor: default;
+            pointer-events: none;
+        }
+        .block-hp {
+            font-size: 0.55rem;
+            background: #2e1e0ecc;
+            margin-top: 6px;
+            padding: 2px;
+            border-radius: 8px;
+            color: #ffd966;
+        }
+        .hammer-stats {
+            background: #1f1b14;
+            padding: 8px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.6rem;
+            margin-top: 8px;
+            color: #ffd99e;
+        }
+        .attack-btn {
+            background: #8b5a2b;
+            border: none;
+            font-family: monospace;
+            font-size: 0.8rem;
+            padding: 8px 16px;
+            margin-top: 10px;
+            color: white;
+            box-shadow: 0 4px 0 #4a2a1a;
+            cursor: pointer;
+            width: 100%;
+        }
+        .attack-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #4a2a1a; }
+        .info {
+            background: #1f1b14;
+            border: 2px solid #8b6946;
+            padding: 8px;
+            font-size: 0.5rem;
+            color: #eedd99;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+        }
+        .reset-btn {
+            background: #4a2a2a;
+            border: none;
+            color: #ffbb77;
+            padding: 4px 10px;
+            font-family: monospace;
+            cursor: pointer;
+        }
+        button:disabled { opacity: 0.5; transform: none; pointer-events: none; }
+        .pixel-particle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: #f5a442;
+            pointer-events: none;
+            z-index: 200;
+            animation: fly 0.4s ease-out forwards;
+        }
+        @keyframes fly {
+            0% { opacity: 1; transform: translate(0,0); }
+            100% { opacity: 0; transform: translate(calc(var(--dx, -20px) * 1px), calc(var(--dy, -20px) * 1px)); }
+        }
+        @media (max-width: 550px) {
+            .dungeon-block { width: 55px; font-size: 0.55rem; }
+            .hammer { font-size: 1.8rem; }
+        }
     </style>
 </head>
 <body>
 <div class="game">
     <div class="stats">
-        <div class="card"><span>💰 БАЛАНС</span><div class="value" id="balance">1000</div></div>
-        <div class="card"><span>⚙️ СТАВКА</span><div class="bet-control"><button id="betMinus">-</button><input type="number" id="betAmount" value="50" step="10" min="10"><button id="betPlus">+</button></div></div>
+        <div class="card"><span>💰 БАЛАНС, ₽</span><div class="value" id="balance">1000</div></div>
+        <div class="card"><span>⚙️ СТАВКА, ₽</span><div class="bet-control"><button id="betMinus">-</button><input type="number" id="betAmount" value="50" step="10" min="10"><button id="betPlus">+</button></div></div>
+    </div>
+    <div class="action-buttons">
+        <button class="action-btn" id="depositBtn">➕ ПОПОЛНИТЬ</button>
+        <button class="action-btn" id="withdrawBtn">➖ ВЫВЕСТИ</button>
     </div>
     <div class="roulette">
         <div class="hammer" id="hammerIcon">🔨 ?</div>
         <div class="desc" id="hammerDesc">Крути рулетку!</div>
         <button class="spin-btn" id="spinBtn">🎲 КРУТИТЬ</button>
     </div>
-    <div style="text-align:center; color:#ffefcf; margin-bottom:8px;">💥 ВЫБЕРИ БЛОК 💥</div>
-    <div class="blocks" id="blocksContainer"></div>
-    <div class="info"><span id="gameMessage">🔨 Выпадет молоток → ломай блок x2,x3,x5,x7</span><button class="reset-btn" id="resetBtn">🔄 Сброс</button></div>
+
+    <!-- Подземелье с блоками -->
+    <div class="dungeon-area" id="dungeonArea" style="display: none;">
+        <div class="blocks-row" id="blocksContainer"></div>
+        <div class="hammer-stats">
+            <span>🔨 Молоток силы: <span id="hammerStrength">0</span>x</span>
+            <span>⚡ Ударов осталось: <span id="hammerDurability">0</span></span>
+        </div>
+        <button class="attack-btn" id="attackBtn">💥 УДАРИТЬ ПО БЛОКУ 💥</button>
+        <div style="font-size:0.5rem; margin-top:6px; text-align:center;" id="dungeonMessage">Нажми УДАРИТЬ, чтобы крушить блоки!</div>
+    </div>
+
+    <div class="info">
+        <span id="gameMessage">🔨 Выпадет молоток → пробивай блоки до сундука!</span>
+        <button class="reset-btn" id="resetBtn">🔄 СБРОС</button>
+    </div>
 </div>
+
 <script>
-    // ----- НАСТРОЙКИ -----
-    const STORAGE_KEY = 'hammerBalance';
+    // ---------- КОНФИГ ----------
+    const STORAGE_KEY = 'hammerDungeonBalance';
     const DEFAULT_BALANCE = 1000;
     const MIN_BET = 10;
     const MAX_BET = 10000;
-    const HAMMER_TYPES = [1,2,3,null]; // null = пусто
-    const BLOCKS = [
-        { mult: 2, emoji: "🪨" },
-        { mult: 3, emoji: "🗿" },
-        { mult: 5, emoji: "💎" },
-        { mult: 7, emoji: "✨" }
-    ];
-    const POWER_NAMES = { 1:"🔨 Слабый", 2:"🔨🔨 Средний", 3:"🔨🔨🔨 Сильный" };
 
-    // ----- СОСТОЯНИЕ -----
+    // Данные подземелья: каждый блок имеет { hp, multiplierRange, isChest? }
+    // Блоки: 5 обычных + сундук
+    const DUNGEON_BLOCKS = [
+        { name: "Камень", hp: 2, multMin: 0.75, multMax: 2.0, isChest: false },
+        { name: "Земля", hp: 3, multMin: 1.0, multMax: 3.0, isChest: false },
+        { name: "Дерево", hp: 4, multMin: 1.5, multMax: 4.0, isChest: false },
+        { name: "Руда", hp: 5, multMin: 2.0, multMax: 5.0, isChest: false },
+        { name: "Обсидиан", hp: 6, multMin: 3.0, multMax: 7.0, isChest: false },
+        { name: "⭐ Сундук сокровищ ⭐", hp: 1, multMin: 10, multMax: 10, isChest: true }
+    ];
+
+    // Характеристики молотков: strength => { totalHits, damagePerHit } damage всегда 1 (упрощенно, но для баланса урон =1, а HP блоков разные)
+    // Количество ударов (durability) согласно условию: молоток 2x - 6 ударов (ломает 2.5 блока), 3x - 11 ударов (3.5), 5x - 21 удар (5.5), 7x - 30 (ломает все)
+    const HAMMER_STATS = {
+        2: { durability: 6,  name: "2x" },
+        3: { durability: 11, name: "3x" },
+        5: { durability: 21, name: "5x" },
+        7: { durability: 30, name: "7x" }
+    };
+    const HAMMER_TYPES = [2,3,5,7,null]; // null = пусто в рулетке
+
     let balance = DEFAULT_BALANCE;
     let currentBet = 50;
-    let phase = "idle";        // idle, spinning, hammerReady, waitingReset
-    let hammerPower = null;
-    let blockUsed = false;
+    let phase = "idle";         // idle, spinning, dungeonActive
+    let currentHammer = null;   // { strength, durabilityLeft }
+    let dungeonState = {
+        blocks: [],          // копия DUNGEON_BLOCKS с текущим hp
+        currentBlockIndex: 0,
+        totalMultiplier: 1,   // накопленный множитель ставки
+        completed: false
+    };
     let blocksDOM = [];
 
-    // ----- DOM -----
+    // DOM элементы
     const balanceEl = document.getElementById('balance');
     const betInput = document.getElementById('betAmount');
     const spinBtn = document.getElementById('spinBtn');
     const hammerIcon = document.getElementById('hammerIcon');
     const hammerDesc = document.getElementById('hammerDesc');
-    const blocksContainer = document.getElementById('blocksContainer');
     const gameMessageSpan = document.getElementById('gameMessage');
     const resetBtn = document.getElementById('resetBtn');
+    const depositBtn = document.getElementById('depositBtn');
+    const withdrawBtn = document.getElementById('withdrawBtn');
+    const dungeonArea = document.getElementById('dungeonArea');
+    const blocksContainer = document.getElementById('blocksContainer');
+    const hammerStrengthSpan = document.getElementById('hammerStrength');
+    const hammerDurabilitySpan = document.getElementById('hammerDurability');
+    const attackBtn = document.getElementById('attackBtn');
+    const dungeonMessageSpan = document.getElementById('dungeonMessage');
 
-    // ----- ФУНКЦИИ -----
+    // ---------- ОБЩИЕ ФУНКЦИИ ----------
     function saveBalance() { localStorage.setItem(STORAGE_KEY, balance); }
     function loadBalance() {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -96,62 +360,13 @@
     function setMessage(msg, isError = false) {
         gameMessageSpan.innerHTML = msg;
         if (isError) setTimeout(() => {
-            if (gameMessageSpan.innerHTML === msg) 
-                gameMessageSpan.innerHTML = "🔨 Выпадет молоток → ломай блок x2,x3,x5,x7";
-        }, 2000);
+            if (gameMessageSpan.innerHTML === msg) gameMessageSpan.innerHTML = "🔨 Крути рулетку и пробивай блоки!";
+        }, 3000);
     }
-    function updateBlocksState() {
-        const canInteract = (phase === "hammerReady" && !blockUsed);
-        blocksDOM.forEach(block => {
-            if (canInteract) {
-                block.classList.remove('disabled', 'broken');
-                block.style.pointerEvents = 'auto';
-            } else {
-                block.classList.add('disabled');
-                block.style.pointerEvents = 'none';
-            }
-            if (blockUsed) block.classList.add('broken');
-        });
-    }
-    function resetRound() {
-        phase = "idle";
-        hammerPower = null;
-        blockUsed = false;
-        hammerIcon.innerHTML = "🔨 ?";
-        hammerDesc.innerText = "Крути рулетку!";
-        updateBlocksState();
-        updateUI();
-    }
-    function finishSpin(result) {
-        hammerPower = result;
-        if (result === null) {
-            hammerIcon.innerHTML = "💨 ПУСТО";
-            hammerDesc.innerText = "Ничего не выпало!";
-            setMessage(`😞 Потеряно ${currentBet} монет.`, false);
-            phase = "idle";
-            blockUsed = false;
-            updateBlocksState();
-            updateUI();
-            setTimeout(() => {
-                if (phase === "idle") {
-                    hammerIcon.innerHTML = "🔨 ?";
-                    hammerDesc.innerText = "Крути рулетку!";
-                }
-            }, 1500);
-        } else {
-            const powerText = POWER_NAMES[result];
-            hammerIcon.innerHTML = `${powerText} ⚡`;
-            hammerDesc.innerText = `Сила ${result}x! Бей блок!`;
-            setMessage(`🎉 Молоток силы ${result}! Нажми на любой блок!`, false);
-            phase = "hammerReady";
-            blockUsed = false;
-            updateBlocksState();
-        }
-        spinBtn.disabled = false;
-        updateUI();
-    }
+
+    // ---------- РУЛЕТКА ----------
     function spinRoulette() {
-        if (phase !== "idle") { setMessage("Заверши текущий раунд!", true); return false; }
+        if (phase !== "idle") { setMessage("Сначала заверши текущее подземелье!", true); return false; }
         if (balance < currentBet) { setMessage("Не хватает монет!", true); return false; }
         balance -= currentBet;
         saveBalance();
@@ -160,78 +375,244 @@
         spinBtn.disabled = true;
         setMessage("🎡 Рулетка крутится...");
         hammerIcon.innerHTML = "🌀🌀🌀";
-        hammerDesc.innerText = "Выпадает...";
+        hammerDesc.innerText = "Выпадает молоток...";
         
-        const outcomes = HAMMER_TYPES;
         let step = 0;
-        const maxSteps = 12;
+        const totalSteps = 12;
         const interval = setInterval(() => {
-            const rand = outcomes[Math.floor(Math.random() * outcomes.length)];
+            const rand = HAMMER_TYPES[Math.floor(Math.random() * HAMMER_TYPES.length)];
             if (rand === null) {
                 hammerIcon.innerHTML = "💨 ?";
-                hammerDesc.innerText = "Мимо...";
+                hammerDesc.innerText = "Пусто...";
             } else {
-                hammerIcon.innerHTML = POWER_NAMES[rand] + " ⚡".repeat(rand);
-                hammerDesc.innerText = `Сила ${rand}x`;
+                hammerIcon.innerHTML = `🔨 ${rand}x ⚡`;
+                hammerDesc.innerText = `Сила ${rand}x!`;
             }
             step++;
-            if (step >= maxSteps) {
+            if (step >= totalSteps) {
                 clearInterval(interval);
-                const final = outcomes[Math.floor(Math.random() * outcomes.length)];
-                finishSpin(final);
+                const finalResult = HAMMER_TYPES[Math.floor(Math.random() * HAMMER_TYPES.length)];
+                finishSpin(finalResult);
             }
-        }, 65);
-        return true;
+        }, 70);
     }
-    function useHammer(blockIndex, multiplier) {
-        if (phase !== "hammerReady" || blockUsed || hammerPower === null) {
-            setMessage("Сначала выиграй молоток!", true);
-            return;
+    function finishSpin(hammerStrength) {
+        if (hammerStrength === null) {
+            hammerIcon.innerHTML = "💨 ПУСТО";
+            hammerDesc.innerText = "Ничего не выпало!";
+            setMessage(`😞 Проигрыш: -${currentBet} ₽`, false);
+            phase = "idle";
+            updateUI();
+            spinBtn.disabled = false;
+        } else {
+            // Выпал молоток — запускаем подземелье
+            const stats = HAMMER_STATS[hammerStrength];
+            currentHammer = {
+                strength: hammerStrength,
+                durabilityLeft: stats.durability,
+                maxDurability: stats.durability
+            };
+            // Инициализируем подземелье
+            initDungeon();
+            phase = "dungeonActive";
+            dungeonArea.style.display = "block";
+            hammerIcon.innerHTML = `🔨 ${hammerStrength}x МОЛОТ!`;
+            hammerDesc.innerText = `Сила ${hammerStrength}x, ударов: ${stats.durability}`;
+            setMessage(`🎉 Молоток силы ${hammerStrength}x! Пробивай блоки!`, false);
+            updateDungeonUI();
+            spinBtn.disabled = true;  // нельзя крутить пока не закончили
         }
-        const win = currentBet * multiplier * hammerPower;
-        balance += win;
-        blockUsed = true;
-        saveBalance();
         updateUI();
-        // анимация
-        const blockEl = blocksDOM[blockIndex];
-        blockEl.style.transform = "scale(0.95)";
-        setTimeout(() => blockEl.style.transform = "", 120);
-        hammerIcon.innerHTML = `💥 ${POWER_NAMES[hammerPower]} 💥`;
-        hammerDesc.innerText = `Удар! +${win} монет`;
-        setMessage(`🎉 Разбил блок x${multiplier} молотком силы ${hammerPower}! Выигрыш: ${win} 🎉`, false);
-        phase = "waitingReset";
-        updateBlocksState();
-        setTimeout(() => {
-            if (phase === "waitingReset") {
-                resetRound();
-                setMessage("🔨 Крути рулетку снова!", false);
-                updateUI();
-            }
-        }, 1800);
     }
-    function buildBlocks() {
+
+    // ---------- ПОДЗЕМЕЛЬЕ ----------
+    function initDungeon() {
+        dungeonState.blocks = DUNGEON_BLOCKS.map(b => ({ ...b, currentHp: b.hp }));
+        dungeonState.currentBlockIndex = 0;
+        dungeonState.totalMultiplier = 1;
+        dungeonState.completed = false;
+        renderBlocksVisual();
+        updateDungeonUI();
+        dungeonMessageSpan.innerHTML = "🔨 Начинай крушить блоки!";
+    }
+
+    function renderBlocksVisual() {
         blocksContainer.innerHTML = "";
         blocksDOM = [];
-        BLOCKS.forEach((block, idx) => {
-            const div = document.createElement('div');
-            div.className = 'block';
-            div.innerHTML = `🔨 ${block.mult}x<br><span>${block.emoji}</span>`;
-            div.addEventListener('click', (e) => {
-                e.stopPropagation();
-                useHammer(idx, block.mult);
-            });
-            blocksContainer.appendChild(div);
-            blocksDOM.push(div);
+        dungeonState.blocks.forEach((block, idx) => {
+            const blockDiv = document.createElement('div');
+            blockDiv.className = 'dungeon-block';
+            if (idx === dungeonState.currentBlockIndex && !dungeonState.completed) blockDiv.classList.add('active-block');
+            if (block.currentHp <= 0) blockDiv.classList.add('broken');
+            const multText = block.isChest ? "x10" : `${block.multMin}–${block.multMax}x`;
+            blockDiv.innerHTML = `
+                <div style="font-size:0.65rem;">${block.name}</div>
+                <div class="block-hp">❤️ ${block.currentHp > 0 ? block.currentHp : 0}</div>
+                <div style="font-size:0.45rem;">${multText}</div>
+            `;
+            blocksContainer.appendChild(blockDiv);
+            blocksDOM.push(blockDiv);
         });
-        updateBlocksState();
+    }
+
+    function updateDungeonUI() {
+        if (!currentHammer) return;
+        hammerStrengthSpan.innerText = currentHammer.strength;
+        hammerDurabilitySpan.innerText = currentHammer.durabilityLeft;
+        renderBlocksVisual();
+        if (dungeonState.completed || dungeonState.currentBlockIndex >= dungeonState.blocks.length) {
+            finishDungeon();
+        }
+    }
+
+    function attackBlock() {
+        if (phase !== "dungeonActive") return;
+        if (dungeonState.completed) {
+            setMessage("Подземелье уже пройдено! Начни новый раунд.", true);
+            return;
+        }
+        if (currentHammer.durabilityLeft <= 0) {
+            dungeonMessageSpan.innerHTML = "💔 Молоток сломался! Ты не дошел до сундука.";
+            finishDungeon(false);
+            return;
+        }
+        let currentBlock = dungeonState.blocks[dungeonState.currentBlockIndex];
+        if (!currentBlock || currentBlock.currentHp <= 0) {
+            // перейти к следующему блоку
+            dungeonState.currentBlockIndex++;
+            if (dungeonState.currentBlockIndex >= dungeonState.blocks.length) {
+                finishDungeon(true);
+                return;
+            }
+            currentBlock = dungeonState.blocks[dungeonState.currentBlockIndex];
+        }
+        // наносим удар
+        currentHammer.durabilityLeft--;
+        currentBlock.currentHp--;
+        
+        // анимация частиц
+        spawnParticlesFromButton();
+        
+        // если блок разрушен
+        if (currentBlock.currentHp <= 0) {
+            // получаем множитель
+            let multiplier = 0;
+            if (currentBlock.isChest) {
+                multiplier = 10;
+                dungeonMessageSpan.innerHTML = "✨ Ты открыл сундук! +10x к выигрышу! ✨";
+            } else {
+                // случайный множитель в диапазоне
+                let min = currentBlock.multMin;
+                let max = currentBlock.multMax;
+                multiplier = +(Math.random() * (max - min) + min).toFixed(2);
+                dungeonMessageSpan.innerHTML = `💥 Блок разрушен! +${multiplier}x к сумме!`;
+            }
+            dungeonState.totalMultiplier *= multiplier;
+            // звуковой эффект (воображение)
+            // переходим к следующему блоку автоматически
+            dungeonState.currentBlockIndex++;
+            if (dungeonState.currentBlockIndex >= dungeonState.blocks.length) {
+                finishDungeon(true);
+                return;
+            }
+        } else {
+            dungeonMessageSpan.innerHTML = `Удар! Осталось HP: ${currentBlock.currentHp}`;
+        }
+        updateDungeonUI();
+        // если удары кончились после удара
+        if (currentHammer.durabilityLeft <= 0 && !dungeonState.completed) {
+            dungeonMessageSpan.innerHTML = "⚡ Молоток иссяк... Ты не смог дойти до конца.";
+            finishDungeon(false);
+        }
+    }
+
+    function finishDungeon(success = false) {
+        if (dungeonState.completed) return;
+        dungeonState.completed = true;
+        let winAmount = 0;
+        if (success && dungeonState.currentBlockIndex >= dungeonState.blocks.length) {
+            // прошли все блоки и сундук
+            winAmount = currentBet * dungeonState.totalMultiplier;
+            balance += winAmount;
+            setMessage(`🎉 ПОБЕДА! Ты прошёл всё подземелье! Выигрыш: ${winAmount} ₽ (x${dungeonState.totalMultiplier.toFixed(2)}) 🎉`, false);
+        } else {
+            // не дошли до конца, но получили множители от разрушенных блоков
+            winAmount = currentBet * dungeonState.totalMultiplier;
+            balance += winAmount;
+            setMessage(`🏆 Ты разрушил ${dungeonState.currentBlockIndex} блоков. Выигрыш: ${winAmount} ₽ (множитель x${dungeonState.totalMultiplier.toFixed(2)})`, false);
+        }
+        saveBalance();
+        updateUI();
+        // сброс подземелья и возврат в idle
+        phase = "idle";
+        dungeonArea.style.display = "none";
+        currentHammer = null;
+        spinBtn.disabled = false;
+        hammerIcon.innerHTML = "🔨 ?";
+        hammerDesc.innerText = "Крути рулетку!";
+        updateUI();
+    }
+
+    function spawnParticlesFromButton() {
+        const btn = attackBtn;
+        const rect = btn.getBoundingClientRect();
+        for (let i=0;i<12;i++) {
+            const p = document.createElement('div');
+            p.className = 'pixel-particle';
+            const dx = (Math.random() - 0.5) * 50;
+            const dy = (Math.random() - 0.5) * 30 - 20;
+            p.style.setProperty('--dx', dx);
+            p.style.setProperty('--dy', dy);
+            p.style.left = rect.left + rect.width/2 + 'px';
+            p.style.top = rect.top + rect.height/2 + 'px';
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 400);
+        }
+    }
+
+    // ---------- БАНКОВСКИЕ ОПЕРАЦИИ ----------
+    function deposit() {
+        if (phase !== "idle") { setMessage("Закончи раунд!", true); return; }
+        let amount = prompt("💰 Сумма пополнения (₽):", "500");
+        if (!amount) return;
+        amount = parseInt(amount);
+        if (isNaN(amount) || amount <= 0) { setMessage("Некорректно", true); return; }
+        amount = Math.min(amount, 100000);
+        balance += amount;
+        saveBalance();
+        updateUI();
+        setMessage(`➕ Пополнено на ${amount} ₽`, false);
+    }
+    function withdraw() {
+        if (phase !== "idle") { setMessage("Закончи раунд!", true); return; }
+        let amount = prompt("💸 Сумма вывода (₽):", "100");
+        if (!amount) return;
+        amount = parseInt(amount);
+        if (isNaN(amount) || amount <= 0) { setMessage("Некорректно", true); return; }
+        if (amount > balance) { setMessage("Не хватает средств", true); return; }
+        balance -= amount;
+        saveBalance();
+        updateUI();
+        setMessage(`➖ Выведено ${amount} ₽`, false);
+    }
+    function resetFullGame() {
+        if (phase !== "idle") { setMessage("Сначала закончи раунд", true); return; }
+        balance = DEFAULT_BALANCE;
+        currentBet = Math.min(currentBet, balance);
+        saveBalance();
+        updateUI();
+        setMessage("Баланс сброшен до 1000 ₽", false);
+        hammerIcon.innerHTML = "🔨 ?";
+        hammerDesc.innerText = "Крути рулетку!";
+        if (dungeonArea.style.display !== "none") dungeonArea.style.display = "none";
+        phase = "idle";
+        spinBtn.disabled = false;
     }
     function changeBet(delta) {
         if (phase !== "idle") { setMessage("Меняй ставку между раундами", true); return; }
         let newBet = currentBet + delta;
-        if (newBet < MIN_BET) newBet = MIN_BET;
+        newBet = Math.min(MAX_BET, Math.max(MIN_BET, newBet));
         if (newBet > balance && balance > 0) newBet = balance;
-        if (newBet > MAX_BET) newBet = MAX_BET;
         if (newBet <= 0) newBet = MIN_BET;
         currentBet = newBet;
         updateUI();
@@ -245,39 +626,24 @@
         currentBet = val;
         updateUI();
     }
-    function resetFullGame() {
-        if (phase !== "idle") { setMessage("Сначала закончи раунд", true); return; }
-        balance = DEFAULT_BALANCE;
-        currentBet = Math.min(currentBet, balance);
-        saveBalance();
-        updateUI();
-        resetRound();
-        setMessage("Баланс сброшен до 1000", false);
-        hammerIcon.innerHTML = "🔨 ?";
-        hammerDesc.innerText = "Крути рулетку!";
-    }
 
-    // ----- ЗАПУСК -----
+    // ---------- ИНИЦИАЛИЗАЦИЯ ----------
     function init() {
         loadBalance();
-        buildBlocks();
         updateUI();
-        resetRound();
         spinBtn.addEventListener('click', spinRoulette);
+        attackBtn.addEventListener('click', attackBlock);
         document.getElementById('betMinus').addEventListener('click', () => changeBet(-10));
         document.getElementById('betPlus').addEventListener('click', () => changeBet(10));
         betInput.addEventListener('change', handleBetInput);
-        betInput.addEventListener('input', function() {
-            let v = parseInt(this.value);
-            if (!isNaN(v)) {
-                if (v > MAX_BET) this.value = MAX_BET;
-                if (v < MIN_BET) this.value = MIN_BET;
-            }
-        });
         resetBtn.addEventListener('click', resetFullGame);
-        window.addEventListener('beforeunload', () => saveBalance());
+        depositBtn.addEventListener('click', deposit);
+        withdrawBtn.addEventListener('click', withdraw);
+        dungeonArea.style.display = "none";
+        phase = "idle";
     }
     init();
 </script>
 </body>
 </html>
+
